@@ -1,0 +1,40 @@
+{
+  "name": "chainwill-dapp",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Decentralized Digital Will Platform on Ethereum",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "hardhat:compile": "hardhat compile",
+    "hardhat:test": "hardhat test",
+    "hardhat:deploy": "hardhat run scripts/deploy.js --network sepolia",
+    "hardhat:deploy:local": "hardhat run scripts/deploy.js --network localhost"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.0",
+    "ethers": "^6.10.0",
+    "axios": "^1.7.0",
+    "react-hot-toast": "^2.4.1",
+    "framer-motion": "^10.16.16"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8",
+    "tailwindcss": "^3.4.1",
+    "postcss": "^8.4.32",
+    "autoprefixer": "^10.4.17",
+    "hardhat": "^2.21.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@nomicfoundation/hardhat-ethers": "^3.0.5",
+    "@nomicfoundation/hardhat-chai-matchers": "^2.0.6",
+    "@openzeppelin/contracts": "^5.0.1",
+    "ethers": "^6.10.0",
+    "chai": "^4.3.10",
+    "dotenv": "^16.4.1"
+  }
+}

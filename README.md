@@ -1,6 +1,32 @@
-# ChainWill - Decentralized Digital Will Platform
+# 🔗 ChainWill - Decentralized Digital Will Platform
 
 A complete blockchain-based dApp for creating and managing digital wills on Ethereum. Users can create wills, assign beneficiaries, lock assets, and have them automatically transferred upon verified inactivity.
+
+## 🚀 Live Demo
+
+**👉 [https://digital-will-blockchain.vercel.app/](https://digital-will-blockchain.vercel.app/)**
+
+Try it now with sample data pre-filled! (Works on Ethereum Sepolia Testnet)
+
+### 📋 Pre-Filled Sample Data (for Demo)
+
+When you navigate to "Create Will", the form comes pre-filled with realistic sample data:
+
+| Field | Sample Value |
+|-------|--------------|
+| **Beneficiary 1** | Sarah Johnson - `0x742d35Cc6634C0532925a3b844Bc9e7595f42bE` - 50% |
+| **Beneficiary 2** | Michael Chen - `0x8ba1f109551bD432803012645Ac136ddd64DBA72` - 30% |
+| **Beneficiary 3** | Emma Rodriguez - `0x1234567890123456789012345678901234567890` - 20% |
+| **Inactivity Period** | 365 days (1 year) |
+| **Executor** | `0x9876543210987654321098765432109876543210` |
+| **ETH Amount** | 2.5 ETH |
+| **Will Document** | Sample_Will_Document.pdf (with IPFS hash) |
+
+**You can:**
+- Edit all values before submission
+- Remove/add beneficiaries
+- Upload your own document
+- Submit a real transaction (requires Sepolia testnet ETH)
 
 ## 🌟 Features
 
@@ -302,6 +328,36 @@ PE1/
 ```
 
 ## Deployment to Production
+
+### 📦 Live Deployment (Vercel)
+
+**Current Deployment:** https://digital-will-blockchain.vercel.app/
+
+The application is currently deployed and live on Vercel. Every push to the `main` branch automatically triggers a new deployment.
+
+#### Deploy Your Own Copy to Vercel:
+
+1. **Fork this repository** on GitHub
+
+2. **Connect to Vercel:**
+   ```bash
+   npm install -g vercel
+   vercel
+   ```
+
+3. **Set Environment Variables in Vercel Dashboard:**
+   - Go to your Vercel project settings
+   - Add `VITE_CONTRACT_ADDRESS` with your deployed smart contract address
+   - Optionally add Pinata keys for IPFS uploads
+
+4. **Deploy:**
+   ```bash
+   vercel --prod
+   ```
+
+5. **Auto Deployments:**
+   - Connect your GitHub repo to Vercel
+   - Every push to `main` will auto-deploy
 
 ### 1. Build Frontend
 

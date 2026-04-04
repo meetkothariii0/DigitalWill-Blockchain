@@ -15,14 +15,32 @@ const CreateWill = () => {
   const fileInputRef = useRef();
 
   const [step, setStep] = useState(1);
-  const [beneficiaries, setBeneficiaries] = useState([]);
+  const [beneficiaries, setBeneficiaries] = useState([
+    {
+      name: "Sarah Johnson",
+      walletAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595f42bE",
+      percentage: 50,
+    },
+    {
+      name: "Michael Chen",
+      walletAddress: "0x8ba1f109551bD432803012645Ac136ddd64DBA72",
+      percentage: 30,
+    },
+    {
+      name: "Emma Rodriguez",
+      walletAddress: "0x1234567890123456789012345678901234567890",
+      percentage: 20,
+    },
+  ]);
   const [formData, setFormData] = useState({
     inactivityPeriod: 365,
-    executor: "",
-    ethAmount: "1",
+    executor: "0x9876543210987654321098765432109876543210",
+    ethAmount: "2.5",
   });
-  const [ipfsHash, setIpfsHash] = useState(null);
-  const [uploadedFile, setUploadedFile] = useState(null);
+  const [ipfsHash, setIpfsHash] = useState("QmSampleWillDocumentHash123456789");
+  const [uploadedFile, setUploadedFile] = useState({
+    name: "Sample_Will_Document.pdf",
+  });
   const [txHash, setTxHash] = useState(null);
   const [txStatus, setTxStatus] = useState(null);
 

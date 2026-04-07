@@ -83,6 +83,14 @@ const CreateWill = () => {
       return;
     }
 
+    // Validate all beneficiary addresses
+    for (const beneficiary of beneficiaries) {
+      if (!isValidAddress(beneficiary.walletAddress)) {
+        toast.error(`Invalid address for beneficiary "${beneficiary.name}"`);
+        return;
+      }
+    }
+
     const totalPercentage = beneficiaries.reduce((sum, b) => sum + b.percentage, 0);
     if (totalPercentage !== 100) {
       toast.error("Beneficiary percentages must sum to 100%");

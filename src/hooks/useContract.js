@@ -381,6 +381,8 @@ const handleContractError = (error) => {
     toast.error("Transaction rejected by user");
   } else if (error.code === "INSUFFICIENT_FUNDS") {
     toast.error("Insufficient funds for transaction");
+  } else if (error.code === "UNCONFIGURED_NAME") {
+    toast.error("Address validation error. Please ensure all wallet addresses are valid Ethereum addresses (starting with 0x)");
   } else if (error.reason) {
     toast.error(`Error: ${error.reason}`);
   } else if (error.message) {

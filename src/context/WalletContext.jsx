@@ -46,8 +46,12 @@ export const WalletProvider = ({ children }) => {
       const account = accounts[0];
       setAccount(account);
 
-      // Create provider and signer
-      const ethersProvider = new ethers.BrowserProvider(window.ethereum);
+      // Create provider and signer with explicit network configuration
+      // This prevents ENS resolution errors on Sepolia testnet
+      const ethersProvider = new ethers.BrowserProvider(window.ethereum, {
+        chainId: SEPOLIA_CHAIN_ID,
+        name: 'sepolia'
+      });
       const ethersSigner = await ethersProvider.getSigner();
 
       setProvider(ethersProvider);

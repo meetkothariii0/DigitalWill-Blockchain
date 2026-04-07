@@ -33,8 +33,13 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
       return;
     }
 
+    if (!formData.percentage) {
+      toast.error("Please enter a percentage");
+      return;
+    }
+
     const percentage = parseInt(formData.percentage);
-    if (!percentage || percentage <= 0) {
+    if (percentage <= 0) {
       toast.error("Percentage must be greater than 0");
       return;
     }
@@ -90,19 +95,22 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
             name="percentage"
             value={formData.percentage}
             onChange={handleInputChange}
-            placeholder="0"
+            placeholder="Enter amount (e.g., 25)"
             min="1"
             max={remainingPercentage}
             className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500"
           />
+          {formData.percentage && parseInt(formData.percentage) > remainingPercentage && (
+            <p className="text-red-400 text-xs mt-1">Cannot exceed {remainingPercentage}% remaining</p>
+          )}
         </div>
 
         <button
           type="submit"
-          className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition disabled:bg-gray-600"
-          disabled={remainingPercentage <= 0}
+          className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition disabled:bg-gray-600 disabled:cursor-not-allowed"
+          disabled={remainingPercentage <= 0 || !formData.percentage || parseInt(formData.percentage) <= 0}
         >
-          Add Beneficiary
+          {remainingPercentage <= 0 ? "100% Already Allocated" : "Add Beneficiary"}
         </button>
       </form>
 

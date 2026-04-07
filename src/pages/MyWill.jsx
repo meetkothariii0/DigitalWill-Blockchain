@@ -104,6 +104,25 @@ const MyWill = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center p-8 bg-red-900 bg-opacity-30 border-2 border-red-600 rounded-lg">
+            <p className="text-red-400 text-lg mb-4">{error}</p>
+            <p className="text-gray-400 text-sm mb-6">Please ensure your wallet is connected and try again.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!will) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 py-12">

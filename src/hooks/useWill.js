@@ -27,10 +27,19 @@ export const useWill = (testatorAddress) => {
       if (!willExists) {
         setWill(null);
         setBeneficiaries([]);
+        setLoading(false);
         return;
       }
 
       const willData = await getWillDetails(testatorAddress);
+      
+      if (!willData) {
+        setWill(null);
+        setBeneficiaries([]);
+        setLoading(false);
+        return;
+      }
+
       const beneficiariesData = await getBeneficiaries(testatorAddress);
       const triggered = await isInactivityTriggered(testatorAddress);
       const timeLeft = await getTimeUntilTrigger(testatorAddress);
@@ -41,7 +50,13 @@ export const useWill = (testatorAddress) => {
       setTimeRemaining(timeLeft);
     } catch (err) {
       console.error("Error fetching will:", err);
-      setError("Failed to fetch will details");
+      // Handle specific error codes
+      if (err.code === "NOT_FOUND" || err.code === 404) {
+        setWill(null);
+        setBeneficiaries([]);
+      } else {
+        setError("Failed to fetch will details. Please try refreshing the page.");
+      }
     } finally {
       setLoading(false);
     }

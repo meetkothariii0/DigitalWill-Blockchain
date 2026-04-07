@@ -266,7 +266,12 @@ export const useContract = () => {
         return will;
       } catch (error) {
         console.error("Get will details error:", error);
-        return null;
+        // Handle 404/NOT_FOUND errors gracefully
+        if (error.code === "NOT_FOUND" || error.code === 404) {
+          return null;
+        }
+        // Re-throw other errors so they can be handled by the caller
+        throw error;
       }
     },
     [contract]

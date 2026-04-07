@@ -2,52 +2,1009 @@
 
 A complete blockchain-based dApp for creating and managing digital wills on Ethereum. Users can create wills, assign beneficiaries, lock assets, and have them automatically transferred upon verified inactivity.
 
-## 🚀 Live Demo
+## � Project Overview - What & Why
 
-**👉 [https://digital-will-blockchain.vercel.app/](https://digital-will-blockchain.vercel.app/)**
+This project demonstrates a **Web3 decentralized application** that solves a real-world problem: **What happens to your digital assets when you pass away?**
 
-Try it now with sample data pre-filled! (Works on Ethereum Sepolia Testnet)
+### The Problem
+- Traditional wills are paper-based and don't cover crypto assets
+- No automated way to transfer crypto upon death
+- Requires trust in a third party (lawyer, executor)
+- No transparency or verification
 
-### 📋 Pre-Filled Sample Data (for Demo)
+### Our Solution
+- **Blockchain-based will** stored permanently on Ethereum
+- **Smart contracts** automate asset distribution
+- **No intermediaries** - trustless execution
+- **Transparent** - all transactions are verifiable
+- **Proof of Life** - testator can prevent accidental transfers
 
-When you navigate to "Create Will", the form comes pre-filled with realistic sample data:
+---
 
-| Field | Sample Value |
-|-------|--------------|
-| **Beneficiary 1** | Sarah Johnson - `0x742d35Cc6634C0532925a3b844Bc9e7595f42bE` - 50% |
-| **Beneficiary 2** | Michael Chen - `0x8ba1f109551bD432803012645Ac136ddd64DBA72` - 30% |
-| **Beneficiary 3** | Emma Rodriguez - `0x1234567890123456789012345678901234567890` - 20% |
-| **Inactivity Period** | 365 days (1 year) |
-| **Executor** | `0x9876543210987654321098765432109876543210` |
-| **ETH Amount** | 2.5 ETH |
-| **Will Document** | Sample_Will_Document.pdf (with IPFS hash) |
+## 🛠 Complete Tech Stack Explanation
 
-**You can:**
-- Edit all values before submission
-- Remove/add beneficiaries
-- Upload your own document
-- Submit a real transaction (requires Sepolia testnet ETH)
+### 1. **Frontend Framework - React.js + Vite**
 
-## 🌟 Features
+**What it is:** React is a JavaScript library for building user interfaces using components. Vite is a modern build tool.
 
-- **Create Digital Wills** - Securely store your will on the blockchain
-- **Assign Beneficiaries** - Add multiple beneficiaries with percentage allocations
-- **Lock Assets** - Deposit ETH that's held in escrow until triggered
-- **Proof of Life** - Regularly verify your status to prevent accidental transfers
-- **Auto-Execution** - Smart contracts automatically distribute assets upon inactivity
-- **IPFS Storage** - Upload encrypted will documents to IPFS via Pinata
-- **MetaMask Integration** - Connect your wallet directly from the browser
-- **Real-time Monitoring** - Track inactivity countdown and will status
+**Why we use it:**
+- React manages dynamic UI state (wallet connection, form data, transaction status)
+- Vite provides fast hot module replacement for development
+- Component-based architecture for modular, reusable code
 
-## 🛠 Tech Stack
+**How it works in our app:**
+```
+User clicks "Create Will"
+  ↓
+React component renders form (CreateWill.jsx)
+  ↓
+Form data stored in React state
+  ↓
+User clicks submit
+  ↓
+React calls custom hooks (useContract, useWallet)
+  ↓
+Smart contract interaction happens
+  ↓
+UI updates with transaction status
+```
 
-- **Smart Contract**: Solidity 0.8.20 (OpenZeppelin contracts for security)
-- **Frontend**: React.js + Vite, ethers.js v6, TailwindCSS, React Router v6
-- **Blockchain**: Ethereum Sepolia Testnet
-- **Wallet**: MetaMask
-- **Storage**: Pinata IPFS
-- **Testing**: Hardhat, Chai, Mocha
-- **Styling**: TailwindCSS, Framer Motion
+**Files using React:**
+- `src/App.jsx` - Main app component with routing
+- `src/pages/CreateWill.jsx` - Will creation form
+- `src/pages/MyWill.jsx` - View your will
+- `src/components/` - Reusable UI components
+
+---
+
+### 2. **Blockchain - Ethereum Sepolia Testnet**
+
+**What it is:** A test version of the Ethereum blockchain where transactions are free (use fake ETH).
+
+**Why we use it:**
+- Perfect for development and testing
+- No real money involved
+- Easy to reset or redeploy
+- Mimics real Ethereum network behavior
+- Free test ETH from faucets
+
+**How it works:**
+```
+Your App (React) 
+  ↓
+Sends transaction to Sepolia Network
+  ↓
+Validators confirm transaction
+  ↓
+Smart contract executes on blockchain
+  ↓
+Transaction recorded permanently
+  ↓
+All users can verify it on Etherscan
+```
+
+**Key concepts:**
+- **Chain ID**: 11155111 (unique identifier for Sepolia)
+- **RPC URL**: `https://rpc.sepolia.org` (gateway to the network)
+- **Block Explorer**: Etherscan (view all transactions)
+
+---
+
+### 3. **Smart Contracts - Solidity**
+
+**What it is:** Code that runs on the blockchain (immutable and permanent).
+
+**Why we use it:**
+- Defines the business logic (what a will is, how to execute it)
+- Handles fund custody (securely holds ETH)
+- Enforces rules automatically (no manual override)
+- Trustless execution (no one person can cheat the system)
+
+**How the smart contract works - Step by step:**
+
+#### Step 1: CREATE WILL
+```solidity
+contract function: createWill()
+├─ Input: beneficiaries, inactivityPeriod, executor, ipfsHash
+├─ Actions:
+│  ├─ Validate inputs (beneficiaries total 100%, addresses are valid)
+│  ├─ Store will data on blockchain
+│  ├─ Record current timestamp as "lastProofOfLife"
+│  ├─ Lock the ETH sent with the transaction
+│  └─ Emit CreateWill event
+└─ Output: Will stored on blockchain, ETH locked
+```
+
+**Where the data is stored:**
+```solidity
+mapping(address => Will) public wills;  // All wills stored here
+
+struct Will {
+  address testator;
+  Beneficiary[] beneficiaries;
+  address executor;
+  uint256 inactivityPeriod;
+  uint256 lockedAmount;
+  uint256 lastProofOfLife;
+  string ipfsHash;
+  bool isActive;
+}
+```
+
+#### Step 2: PROOF OF LIFE
+```solidity
+contract function: proofOfLife()
+├─ Actions:
+│  ├─ Get testator's will
+│  ├─ Update "lastProofOfLife" to current time
+│  └─ Reset the inactivity timer
+└─ Output: Timer reset, will stays locked
+```
+
+#### Step 3: CHECK IF INACTIVITY TRIGGERED
+```solidity
+contract function: isInactivityTriggered(testatorAddress)
+├─ Logic:
+│  ├─ Get will
+│  ├─ Calculate time since last proof: now - lastProofOfLife
+│  ├─ Check if time > inactivityPeriod
+│  └─ Return true/false
+└─ Output: Boolean (is triggered or not)
+```
+
+#### Step 4: EXECUTE WILL
+```solidity
+contract function: executeWill(testatorAddress)
+├─ Checks:
+│  ├─ Is caller the executor?
+│  ├─ Is inactivity triggered?
+│  ├─ Does the will still exist?
+│  └─ Is there locked ETH?
+├─ Actions:
+│  ├─ For each beneficiary:
+│  │  ├─ Calculate their share: (lockAmount × percentage) / 100
+│  │  ├─ Send ETH to beneficiary address
+│  │  └─ Log transaction
+│  ├─ Mark will as inactive
+│  └─ Emit WillExecuted event
+└─ Output: ETH distributed to beneficiaries
+```
+
+**Key Security Features in Smart Contract:**
+```solidity
+// Prevents hackers from calling functions multiple times
+using ReentrancyGuard for executeWill;
+
+// Only testator can update their own will
+require(msg.sender == will.testator)
+
+// Checks happen before state changes (CEI pattern)
+// Calculate amounts
+// Change state
+// Send funds (safest order)
+
+// All changes are recorded as events for transparency
+event WillCreated(address indexed testator, ...)
+event WillExecuted(address indexed testator, ...)
+```
+
+**File:** `contracts/DigitalWill.sol`
+
+---
+
+### 4. **Wallet Integration - MetaMask + ethers.js**
+
+**What it is:** MetaMask is a browser extension that manages cryptocurrency. ethers.js is a JavaScript library to interact with blockchain.
+
+**Why we use it:**
+- Users don't give us their private keys (safer)
+- All transactions are signed by the user
+- Users have full control of their funds
+- Industry standard for Web3
+
+**How the wallet flow works:**
+
+```
+User clicks "Connect Wallet"
+  ↓
+App calls: window.ethereum.request({method: 'eth_requestAccounts'})
+  ↓
+MetaMask popup appears
+  ↓
+User clicks "Approve" in MetaMask
+  ↓
+MetaMask sends user's address to app
+  ↓
+App now has access to:
+├─ User's address (0x...)
+├─ User's signer (for signing transactions)
+└─ User's provider (for reading blockchain)
+```
+
+**Code example - Connecting Wallet:**
+```javascript
+// src/context/WalletContext.jsx
+const connectWallet = async () => {
+  // Request accounts from MetaMask
+  const accounts = await window.ethereum.request({
+    method: 'eth_requestAccounts'
+  });
+  
+  // Create ethers provider
+  const provider = new ethers.BrowserProvider(window.ethereum);
+  
+  // Get signer (for signing transactions)
+  const signer = await provider.getSigner();
+  
+  // Store everything in context
+  return { account, provider, signer };
+}
+```
+
+**Files using wallet:**
+- `src/context/WalletContext.jsx` - Wallet state management
+- `src/hooks/useWallet.js` - Custom hook to access wallet
+- `src/hooks/useContract.js` - Creates contract instance with signer
+
+---
+
+### 5. **File Storage - IPFS + Pinata**
+
+**What it is:** IPFS (InterPlanetary File System) is decentralized file storage. Pinata is a service that helps store to IPFS.
+
+**Why we use it:**
+- Smart contracts can only store small amounts of data
+- Will PDF document is too large for blockchain
+- IPFS content is permanent and can't be censored
+- Only the hash (fingerprint) is stored on blockchain
+
+**How it works:**
+
+```
+User uploads Will PDF
+  ↓
+App sends file to Pinata API
+  ↓
+Pinata stores file on IPFS network
+  ↓
+Pinata returns hash: Qm...xyz (256-bit fingerprint)
+  ↓
+App stores hash on blockchain in smart contract
+  ↓
+Later, anyone can retrieve file using the hash
+```
+
+**Code example - Upload to IPFS:**
+```javascript
+// src/utils/ipfs.js
+export const uploadToPinata = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  // Send to Pinata API
+  const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+    method: 'POST',
+    headers: {
+      'pinata_api_key': process.env.VITE_PINATA_API_KEY,
+      'pinata_secret_api_key': process.env.VITE_PINATA_SECRET_KEY
+    },
+    body: formData
+  });
+  
+  const data = await response.json();
+  return data.IpfsHash; // Returns: Qm...xyz
+}
+```
+
+**Where the hash is stored:**
+```solidity
+struct Will {
+  // ... other data ...
+  string ipfsHash;  // Stores: "QmSampleHash123456789"
+}
+```
+
+**Files using IPFS:**
+- `src/utils/ipfs.js` - Upload functions
+- `src/pages/CreateWill.jsx` - Calls upload function
+- Smart contract stores the hash
+
+---
+
+### 6. **UI Styling - TailwindCSS**
+
+**What it is:** Utility-first CSS framework for styling.
+
+**Why we use it:**
+- Faster development (pre-built classes)
+- Consistent design system
+- Responsive design (works on mobile, desktop, etc.)
+- Dark theme for crypto aesthetics
+
+**Example - Styled button with Tailwind:**
+```jsx
+<button className="
+  px-6 py-3              // Padding
+  bg-indigo-600          // Background color
+  hover:bg-indigo-700    // Hover state
+  text-white             // Text color
+  font-bold              // Font weight
+  rounded-lg             // Rounded corners
+  transition             // Smooth animation
+">
+  Create Will
+</button>
+```
+
+**Files using TailwindCSS:**
+- `tailwind.config.js` - Tailwind configuration
+- Every `.jsx` component - Uses className utilities
+
+---
+
+### 7. **Routing - React Router v6**
+
+**What it is:** Library for client-side navigation (pages).
+
+**Why we use it:**
+- Single Page App (SPA) - no page reloads
+- Bookmarkable URLs
+- Back button works correctly
+- Organized page structure
+
+**Routes in our app:**
+```javascript
+// src/App.jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+
+<Routes>
+  <Route path="/" element={<Home />} />
+  <Route path="/create" element={<CreateWill />} />
+  <Route path="/my-will" element={<MyWill />} />
+  <Route path="/beneficiary" element={<BeneficiaryDashboard />} />
+  <Route path="/execute" element={<ExecuteWill />} />
+</Routes>
+```
+
+**How navigation works:**
+```
+User clicks "Create Will" link
+  ↓
+React Router intercepts click
+  ↓
+URL changes to "/create"
+  ↓
+React renders CreateWill.jsx component
+  ↓
+No page reload, instant navigation
+```
+
+---
+
+### 8. **Custom Hooks - State Management**
+
+**What it is:** Reusable logic for React components.
+
+**Why we use it:**
+- Keep components clean and focused
+- Reuse logic across multiple components
+- Easier to test and debug
+
+**Key custom hooks:**
+
+#### `useWallet()` - Manages wallet connection
+```javascript
+// Location: src/hooks/useWallet.js
+const { 
+  account,           // User's address
+  provider,          // Blockchain provider
+  signer,            // For signing transactions
+  isConnected,       // Is wallet connected?
+  connectWallet      // Function to connect
+} = useWallet();
+```
+
+#### `useContract()` - Interacts with smart contract
+```javascript
+// Location: src/hooks/useContract.js
+const { 
+  createWill,        // Call contract: createWill()
+  proofOfLife,       // Call contract: proofOfLife()
+  addFunds,          // Call contract: addFunds()
+  executeWill,       // Call contract: executeWill()
+  getWillDetails,    // Read contract: getWillDetails()
+  loading            // Is transaction pending?
+} = useContract();
+```
+
+#### `useWill()` - Fetches will data
+```javascript
+// Location: src/hooks/useWill.js
+const { 
+  will,              // Will object
+  beneficiaries,     // Beneficiary list
+  isTriggered,       // Is inactivity triggered?
+  timeRemaining,     // Seconds until execution
+  loading,           // Is loading?
+  refetch            // Re-fetch data
+} = useWill(account);
+```
+
+---
+
+## 🔄 Complete User Journey - Everything That Happens
+
+### Step 1: User Arrives at App
+
+```
+1. User opens website
+   ↓
+2. React loads (Vite bundles all components)
+   ↓
+3. App.jsx renders with TailwindCSS styling
+   ↓
+4. WalletProvider context initializes
+   ↓
+5. Home page displays with "Connect Wallet" button
+```
+
+**Technologies used:** React, Vite, TailwindCSS, React Router
+
+---
+
+### Step 2: User Connects Wallet
+
+```
+1. User clicks "Connect Wallet"
+   ↓
+2. Click handler calls: connectWallet() from useWallet
+   ↓
+3. useWallet calls: window.ethereum.request()
+   ↓
+4. MetaMask popup appears
+   ↓
+5. User approves in MetaMask
+   ↓
+6. MetaMask sends back user's address: 0x1234...5678
+   ↓
+7. ethers.js creates:
+   ├─ BrowserProvider (connection to blockchain)
+   ├─ Signer (can sign transactions)
+   └─ Provider (can read blockchain)
+   ↓
+8. WalletContext stores all this data
+   ↓
+9. UI updates to show "Connected: 0x1234...5678"
+```
+
+**Technologies used:** MetaMask, ethers.js, React Context API
+
+---
+
+### Step 3: User Navigates to "Create Will"
+
+```
+1. User clicks "Create Will" in navigation
+   ↓
+2. React Router changes URL to "/create"
+   ↓
+3. CreateWill.jsx component renders
+   ↓
+4. Form loads with pre-filled sample data
+   ↓
+5. User sees 5-step wizard:
+   ├─ Step 1: Add Beneficiaries
+   ├─ Step 2: Set Inactivity Period
+   ├─ Step 3: Assign Executor
+   ├─ Step 4: Upload Document
+   └─ Step 5: Deposit & Create
+```
+
+**Technologies used:** React, React Router, TailwindCSS
+
+---
+
+### Step 4: User Adds Beneficiary
+
+```
+1. User fills form:
+   ├─ Name: "John Doe"
+   ├─ Address: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+   └─ Percentage: "50"
+   ↓
+2. User clicks "Add Beneficiary"
+   ↓
+3. BeneficiaryForm.jsx validates:
+   ├─ Is name not empty? ✓
+   ├─ Is address valid? 
+   │  └─ Calls: isValidAddress() from helpers.js
+   │  └─ Checks: starts with 0x, 42 chars total, valid hex
+   ├─ Is percentage > 0? ✓
+   └─ Is percentage ≤ remaining? ✓
+   ↓
+4. Validation passes!
+   ↓
+5. addBeneficiary() called with beneficiary object
+   ↓
+6. CreateWill.jsx updates state: setBeneficiaries([...])
+   ↓
+7. BeneficiaryForm re-renders showing added beneficiary
+   ↓
+8. Toast notification shows: "Beneficiary added successfully!"
+```
+
+**Technologies used:** React, Custom validation (ethers.js for address checking)
+
+---
+
+### Step 5: User Uploads Will Document
+
+```
+1. User clicks "Upload Document"
+   ↓
+2. File picker dialog opens
+   ↓
+3. User selects Will_Document.pdf
+   ↓
+4. handleFileUpload() calls uploadToPinata(file)
+   ↓
+5. uploadToPinata() in ipfs.js:
+   ├─ Creates FormData with file
+   ├─ Sends to Pinata API
+   │  POST https://api.pinata.cloud/pinning/pinFileToIPFS
+   │  Headers: Include Pinata API keys
+   │  Body: File data
+   ├─ Pinata stores file on IPFS network
+   ├─ Pinata returns hash: "Qm..."
+   └─ Returns hash to component
+   ↓
+6. CreateWill stores hash: setIpfsHash(hash)
+   ↓
+7. UI updates: Shows "File uploaded successfully!"
+```
+
+**Technologies used:** Pinata API, IPFS, React
+
+---
+
+### Step 6: User Submits Will to Blockchain
+
+```
+Step 5a: Validation
+├─ Check all beneficiaries exist
+├─ Check beneficiaries total 100%
+├─ Check executor address valid
+├─ Check ETH amount valid
+└─ Check IPFS hash exists
+
+Step 5b: Prepare Transaction
+├─ Convert inactivityPeriod to seconds: 365 days → 31,536,000 seconds
+├─ Convert ETH to Wei: 0.5 ETH → 500000000000000000 wei
+├─ Format all data for contract
+└─ Create transaction object
+
+Step 5c: Send Transaction to MetaMask
+├─ App calls: contract.createWill(...)
+├─ ethers.js prepares transaction with signer
+├─ Sends to MetaMask
+├─ MetaMask shows confirmation popup
+├─ Gas fee estimate shown
+└─ User reviews and clicks "Approve"
+
+Step 5d: MetaMask Signs Transaction
+├─ User's private key signs transaction
+├─ Signature proves user authorized it
+├─ Transaction is now tamper-proof
+└─ Sent to Ethereum network
+
+Step 5e: Ethereum Network Processes Transaction
+├─ Validators receive transaction
+├─ Smart contract code executes:
+│  ├─ Validate all inputs
+│  ├─ Store will data on blockchain
+│  ├─ Lock ETH in contract
+│  ├─ Record timestamp as lastProofOfLife
+│  ├─ Emit CreateWill event
+│  └─ Return success
+├─ Validators reach consensus (6 confirmations)
+└─ Transaction becomes permanent
+
+Step 5f: App Receives Confirmation
+├─ ethers.js detects transaction mined
+├─ receipt object returned
+├─ App stores: transactionHash
+├─ UI shows success message
+├─ setTxStatus("success")
+└─ Redirect to "/my-will" after 3 seconds
+```
+
+**Technologies used:**
+- Smart Contract (Solidity)
+- ethers.js (transaction builder)
+- MetaMask (signer)
+- Ethereum Sepolia (blockchain)
+
+---
+
+### Step 7: User Views Their Will ("My Will" Page)
+
+```
+1. User navigates to "/my-will"
+   ↓
+2. MyWill.jsx component loads
+   ↓
+3. useWill(account) is called
+   ↓
+4. Hook fetches data:
+   ├─ contract.hasWill(account)
+   │  └─ Checks: Does a will exist for this address?
+   ├─ contract.getWillDetails(account)
+   │  └─ Reads: All will data from blockchain
+   ├─ contract.getBeneficiaries(account)
+   │  └─ Reads: Beneficiary list
+   ├─ contract.isInactivityTriggered(account)
+   │  └─ Reads: Has inactivity period passed?
+   └─ contract.getTimeUntilTrigger(account)
+      └─ Reads: Seconds remaining
+   ↓
+5. Data displayed:
+   ├─ Countdown timer showing time remaining
+   ├─ Beneficiary details and percentages
+   ├─ ETH locked amount
+   ├─ Executor address
+   ├─ Buttons: "Proof of Life", "Add Funds", "Update Executor", "Revoke"
+   └─ Will document link to IPFS
+   ↓
+6. Countdown updates every second
+```
+
+**Technologies used:** React, ethers.js, Smart Contract (view functions)
+
+---
+
+### Step 8: User Sends "Proof of Life"
+
+```
+1. User clicks "Proof of Life" button
+   ↓
+2. proofOfLife() called from useContract
+   ↓
+3. ethers.js prepares transaction
+   ↓
+4. Calls: contract.proofOfLife()
+   ├─ No parameters needed
+   ├─ No ETH sent
+   └─ Just needs signature
+   ↓
+5. MetaMask prompts to approve
+   ↓
+6. User approves in MetaMask
+   ↓
+7. Smart contract executes:
+   ├─ Gets testator's will
+   ├─ Checks: Is caller the testator?
+   ├─ Updates: will.lastProofOfLife = now
+   ├─ Timer resets
+   └─ Emits ProofOfLife event
+   ↓
+8. Transaction mined and confirmed
+   ↓
+9. App refetches data
+   ↓
+10. Countdown timer resets to maximum
+```
+
+**Technologies used:** Smart Contract, ethers.js, MetaMask
+
+---
+
+### Step 9: Beneficiary Checks "Beneficiary Dashboard"
+
+```
+1. Beneficiary navigates to "/beneficiary"
+   ↓
+2. App connects their wallet
+   ↓
+3. Smart contract queried:
+   ├─ Searches all wills in mapping
+   ├─ Finds wills where they're a beneficiary
+   ├─ Returns list with details
+   └─ Shows percentage allocation
+   ↓
+4. Page displays:
+   ├─ Wills they're beneficiary of
+   ├─ Testator's address
+   ├─ Their percentage
+   ├─ Time until automatic distribution
+   └─ Will document links
+```
+
+**Technologies used:** Smart Contract (mappings and loops), React
+
+---
+
+### Step 10: Executor Executes Will (After Inactivity)
+
+```
+1. Executor navigates to "/execute"
+   ↓
+2. Connects their wallet
+   ↓
+3. Sees list of wills where they're executor
+   ↓
+4. Checks will status:
+   ├─ Call: isInactivityTriggered(testatorAddress)
+   ├─ If true: "Eligible to Execute" button appears
+   └─ If false: "Not yet eligible" (shows time remaining)
+   ↓
+5. When inactivity period passes (e.g., 365 days):
+   ├─ Executor clicks "Execute Will"
+   ├─ ethers.js prepares transaction
+   └─ Sends: contract.executeWill(testatorAddress)
+   ↓
+6. Smart contract executes:
+   ├─ Checks executor authorized? ✓
+   ├─ Checks inactivity triggered? ✓
+   ├─ Checks will active? ✓
+   ├─ For each beneficiary:
+   │  ├─ Calculate share: (1000 ETH × 50%) / 100 = 500 ETH
+   │  ├─ Transfer 500 ETH to beneficiary address
+   │  ├─ Emit Transfer event
+   │  └─ Log to blockchain
+   ├─ Mark will as executed
+   └─ Emit WillExecuted event
+   ↓
+7. All beneficiaries receive their ETH
+   ↓
+8. Etherscan shows all transactions
+```
+
+**Technologies used:** Smart Contract, ethers.js, Ethereum (fund transfers)
+
+---
+
+## 📊 Data Flow Diagram
+
+```
+User Browser (React App)
+│
+├─ WalletContext (Manages wallet state)
+│  ├─ account
+│  ├─ provider
+│  ├─ signer
+│  └─ Functions: connectWallet(), switchToSepolia()
+│
+├─ Custom Hooks
+│  ├─ useWallet() → WalletContext
+│  ├─ useContract() → Creates contract instance with signer
+│  └─ useWill() → Fetches will data
+│
+├─ React Components
+│  ├─ CreateWill.jsx → Calls useContract.createWill()
+│  ├─ MyWill.jsx → Calls useWill() for reading
+│  ├─ BeneficiaryDashboard.jsx → Queries beneficiary wills
+│  └─ ExecuteWill.jsx → Call executeWill()
+│
+└─ External Services
+   ├─ MetaMask Extension
+   │  └─ Manages private key and signs transactions
+   │
+   ├─ Pinata API
+   │  └─ Stores files on IPFS
+   │
+   └─ Ethereum Sepolia Network
+      ├─ Validators run nodes
+      ├─ Store blockchain state
+      ├─ Execute smart contracts
+      └─ Process transactions
+         │
+         └─ Smart Contract (DigitalWill.sol)
+            ├─ Storage: mapping(address => Will) wills
+            ├─ Functions: createWill, proofOfLife, executeWill, etc.
+            ├─ Events: WillCreated, WillExecuted, etc.
+            └─ Security: ReentrancyGuard, input validation
+```
+
+---
+
+## 🔐 Security at Every Step
+
+| Step | Security Measure | How it Works |
+|------|------------------|------------|
+| **User Login** | Private key never shared | MetaMask keeps private key local, only sends signatures |
+| **Transaction Signing** | Cryptographic signature | Only testator can sign with their private key |
+| **Smart Contract** | ReentrancyGuard | Prevents recursive calls during fund transfers |
+| **Fund Transfer** | Checks-Effects-Interactions | State changed before sending funds |
+| **Data Storage** | Immutable blockchain | No one can alter historical will data |
+| **Access Control** | Only testator can update | `require(msg.sender == will.testator)` |
+| **File Upload** | IPFS hash fingerprint | Any modification changes hash, breaks link |
+
+---
+
+## 🚀 Quick Start Guide
+
+### 1. Install Dependencies
+```bash
+npm install
+```
+Installs: react, ethers, tailwindcss, react-router, etc.
+
+### 2. Setup Environment (`.env`)
+```
+VITE_CONTRACT_ADDRESS=0x...
+VITE_PINATA_API_KEY=...
+VITE_PINATA_SECRET_KEY=...
+```
+
+### 3. Start Dev Server
+```bash
+npm run dev
+```
+Runs on http://localhost:5173
+
+### 4. Prepare Wallet
+- Install MetaMask
+- Switch to Sepolia Testnet
+- Get test ETH from faucet
+
+### 5. Deploy Contract
+Option A: Use Remix IDE
+- Copy contract to Remix
+- Compile v0.8.20
+- Deploy on Sepolia
+- Copy address to `.env`
+
+Option B: Use Hardhat
+```bash
+npm run hardhat:deploy
+```
+
+---
+
+## 📁 Complete File Structure Explained
+
+```
+PROJECT/
+│
+├── contracts/
+│   └── DigitalWill.sol
+│       └─ Smart contract code (Solidity)
+│       └─ Defines: struct Will, functions, events
+│
+├── src/
+│   ├── App.jsx
+│   │   └─ Main app, sets up routing and providers
+│   │
+│   ├── main.jsx
+│   │   └─ Entry point, renders App to DOM
+│   │
+│   ├── context/
+│   │   └── WalletContext.jsx
+│   │       └─ Global wallet state (account, signer, provider)
+│   │
+│   ├── hooks/
+│   │   ├── useWallet.js
+│   │   │   └─ Access wallet from any component
+│   │   ├── useContract.js
+│   │   │   └─ Create contract instance, call functions
+│   │   └── useWill.js
+│   │       └─ Fetch will data from blockchain
+│   │
+│   ├── utils/
+│   │   ├── contract.js
+│   │   │   └─ CONTRACT_ADDRESS and ABI
+│   │   ├── helpers.js
+│   │   │   └─ formatAddress, isValidAddress, formatEther, etc.
+│   │   └── ipfs.js
+│   │       └─ uploadToPinata function
+│   │
+│   ├── components/
+│   │   ├── Navbar.jsx - Navigation bar
+│   │   ├── WalletConnect.jsx - Connect wallet button
+│   │   ├── BeneficiaryForm.jsx - Add beneficiaries form
+│   │   ├── WillCard.jsx - Display will details
+│   │   ├── CountdownTimer.jsx - Show time remaining
+│   │   ├── ProofOfLifeButton.jsx - Trigger proof of life
+│   │   ├── TransactionStatus.jsx - Show tx status
+│   │   └── (other components)
+│   │
+│   └── pages/
+│       ├── Home.jsx - Landing page
+│       ├── CreateWill.jsx - 5-step will creation
+│       ├── MyWill.jsx - View your will
+│       ├── BeneficiaryDashboard.jsx - See inherited wills
+│       ├── ExecuteWill.jsx - Execute as executor
+│       └── (other pages)
+│
+├── test/
+│   └── DigitalWill.test.js
+│       └─ Tests using Hardhat + Chai
+│
+├── scripts/
+│   └── deploy.js
+│       └─ Deployment script for Hardhat
+│
+├── hardhat.config.js
+│   └─ Hardhat configuration (networks, compiler, etc.)
+│
+├── tailwind.config.js
+│   └─ Tailwind configuration (dark theme, colors, etc.)
+│
+├── vite.config.js
+│   └─ Vite configuration (build settings)
+│
+└── package.json
+    └─ Dependencies and scripts
+        ├─ react, react-dom
+        ├─ ethers
+        ├─ tailwindcss
+        ├─ react-router-dom
+        ├─ hardhat, chai
+        └─ (other packages)
+```
+
+---
+
+## ✅ Verification & Testing
+
+### View on Etherscan
+- Every transaction visible at: https://sepolia.etherscan.io
+- Search by transaction hash or contract address
+- See all contract calls, state changes, events
+
+### Test Smart Contract
+```bash
+npm run hardhat:test
+```
+Runs through all test scenarios
+
+### Lint Frontend Code
+```bash
+npm run lint
+```
+Checks for code quality issues
+
+---
+
+## 🎓 Learning Path
+
+1. **Understand Ethereum & Web3**
+   - Public/private keys
+   - Smart contracts
+   - Gas and transactions
+
+2. **Learn Solidity**
+   - Variables and functions
+   - State management
+   - Events and modifiers
+
+3. **Learn React**
+   - Components and hooks
+   - State management
+   - Forms and validation
+
+4. **Learn ethers.js**
+   - Connect to blockchain
+   - Sign transactions
+   - Read/write to contracts
+
+5. **Study This Project**
+   - Read DigitalWill.sol line by line
+   - Trace a transaction from React to blockchain
+   - Modify and deploy changes
+
+---
+
+## 📞 Support & Resources
+
+- **Ethereum Docs**: https://ethereum.org/developers
+- **Solidity Docs**: https://docs.soliditylang.org
+- **ethers.js**: https://docs.ethers.org/v6
+- **React Docs**: https://react.dev
+- **Hardhat**: https://hardhat.org/docs
+- **MetaMask**: https://docs.metamask.io
+
+---
 
 ## 📋 Prerequisites
 

@@ -18,28 +18,28 @@ const CreateWill = () => {
   const [beneficiaries, setBeneficiaries] = useState([
     {
       name: "Sarah Johnson",
-      walletAddress: "0x742d35Cc6634C0532925a3b844Bc9e7595f42bE",
+      walletAddress: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
       percentage: 50,
     },
     {
       name: "Michael Chen",
-      walletAddress: "0x8ba1f109551bD432803012645Ac136ddd64DBA72",
+      walletAddress: "0x70997970C51812e339D9B73b0245ad59c365d569",
       percentage: 30,
     },
     {
       name: "Emma Rodriguez",
-      walletAddress: "0x1234567890123456789012345678901234567890",
+      walletAddress: "0x3C44CdDdB6a900c6671B36f7D6440ffb3d4F6eff",
       percentage: 20,
     },
   ]);
   const [formData, setFormData] = useState({
     inactivityPeriod: 365,
-    executor: "0x9876543210987654321098765432109876543210",
-    ethAmount: "2.5",
+    executor: "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
+    ethAmount: "0.5",
   });
-  const [ipfsHash, setIpfsHash] = useState("QmSampleWillDocumentHash123456789");
+  const [ipfsHash, setIpfsHash] = useState("QmXxxxxxxxxxxxxxxxxxxxxxxxxxxx");
   const [uploadedFile, setUploadedFile] = useState({
-    name: "Sample_Will_Document.pdf",
+    name: "Will_Document.pdf",
   });
   const [txHash, setTxHash] = useState(null);
   const [txStatus, setTxStatus] = useState(null);

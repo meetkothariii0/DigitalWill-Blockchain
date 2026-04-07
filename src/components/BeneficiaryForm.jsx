@@ -23,24 +23,36 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
   const handleAddBeneficiary = (e) => {
     e.preventDefault();
 
-    if (!formData.name.trim()) {
+    // Trim inputs
+    const name = formData.name.trim();
+    const walletAddress = formData.walletAddress.trim();
+    const percentageStr = formData.percentage.trim();
+
+    if (!name) {
       toast.error("Please enter beneficiary name");
       return;
     }
 
-    if (!isValidAddress(formData.walletAddress)) {
-      toast.error("Please enter a valid Ethereum address");
+    if (!walletAddress) {
+      toast.error("Please enter a wallet address");
       return;
     }
 
-    if (!formData.percentage) {
+    // Validate address - trim before validation
+    if (!isValidAddress(walletAddress)) {
+      console.error("Invalid address:", walletAddress);
+      toast.error("Invalid wallet address. Please check and try again.");
+      return;
+    }
+
+    if (!percentageStr) {
       toast.error("Please enter a percentage");
       return;
     }
 
-    const percentage = parseInt(formData.percentage);
-    if (percentage <= 0) {
-      toast.error("Percentage must be greater than 0");
+    const percentage = parseInt(percentageStr);
+    if (isNaN(percentage) || percentage <= 0) {
+      toast.error("Percentage must be a number greater than 0");
       return;
     }
 
@@ -49,14 +61,16 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
       return;
     }
 
+    console.log("Adding beneficiary:", { name, walletAddress, percentage });
+    
     onAddBeneficiary({
-      name: formData.name,
-      walletAddress: formData.walletAddress,
+      name,
+      walletAddress,
       percentage,
     });
 
     setFormData({ name: "", walletAddress: "", percentage: "" });
-    toast.success("Beneficiary added");
+    toast.success("Beneficiary added successfully!");
   };
 
   return (
@@ -70,7 +84,7 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
             value={formData.name}
             onChange={handleInputChange}
             placeholder="e.g., John Doe"
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500"
+            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
           />
         </div>
 
@@ -82,8 +96,14 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
             value={formData.walletAddress}
             onChange={handleInputChange}
             placeholder="0x..."
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500"
+            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 font-mono text-sm"
           />
+          {formData.walletAddress && isValidAddress(formData.walletAddress.trim()) && (
+            <p className="text-green-400 text-xs mt-1">✓ Valid address</p>
+          )}
+          {formData.walletAddress && !isValidAddress(formData.walletAddress.trim()) && (
+            <p className="text-red-400 text-xs mt-1">✗ Invalid address format</p>
+          )}
         </div>
 
         <div>
@@ -98,7 +118,7 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
             placeholder="Enter amount (e.g., 25)"
             min="1"
             max={remainingPercentage}
-            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500"
+            className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500"
           />
           {formData.percentage && parseInt(formData.percentage) > remainingPercentage && (
             <p className="text-red-400 text-xs mt-1">Cannot exceed {remainingPercentage}% remaining</p>
@@ -108,7 +128,7 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
         <button
           type="submit"
           className="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition disabled:bg-gray-600 disabled:cursor-not-allowed"
-          disabled={remainingPercentage <= 0 || !formData.percentage || parseInt(formData.percentage) <= 0}
+          disabled={!formData.name.trim() || !isValidAddress(formData.walletAddress.trim()) || !formData.percentage || parseInt(formData.percentage) <= 0 || parseInt(formData.percentage) > remainingPercentage}
         >
           {remainingPercentage <= 0 ? "100% Already Allocated" : "Add Beneficiary"}
         </button>
@@ -128,11 +148,14 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
               <div key={index} className="p-3 bg-slate-800 border border-slate-700 rounded flex justify-between items-center">
                 <div>
                   <p className="text-white font-medium">{beneficiary.name}</p>
-                  <p className="text-gray-400 text-xs">{beneficiary.walletAddress.slice(0, 10)}...{beneficiary.walletAddress.slice(-8)}</p>
+                  <p className="text-gray-400 text-xs font-mono">{beneficiary.walletAddress.slice(0, 10)}...{beneficiary.walletAddress.slice(-8)}</p>
                   <p className="text-indigo-400 text-sm font-semibold">{beneficiary.percentage}%</p>
                 </div>
                 <button
-                  onClick={() => onRemoveBeneficiary(index)}
+                  onClick={() => {
+                    onRemoveBeneficiary(index);
+                    toast.success("Beneficiary removed");
+                  }}
                   className="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-sm font-medium transition"
                 >
                   Remove

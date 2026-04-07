@@ -45,7 +45,12 @@ const CreateWill = () => {
   const [txStatus, setTxStatus] = useState(null);
 
   const addBeneficiary = (beneficiary) => {
-    setBeneficiaries([...beneficiaries, beneficiary]);
+    console.log("addBeneficiary called with:", beneficiary);
+    setBeneficiaries((prev) => {
+      const updated = [...prev, beneficiary];
+      console.log("Updated beneficiaries:", updated);
+      return updated;
+    });
   };
 
   const removeBeneficiary = (index) => {

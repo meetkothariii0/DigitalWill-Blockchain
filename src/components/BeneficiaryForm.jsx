@@ -98,11 +98,16 @@ const BeneficiaryForm = ({ onAddBeneficiary, onRemoveBeneficiary, beneficiaries 
             placeholder="0x..."
             className="w-full px-3 py-2 bg-slate-900 border border-slate-700 rounded text-white placeholder-gray-500 focus:outline-none focus:border-indigo-500 font-mono text-sm"
           />
-          {formData.walletAddress && isValidAddress(formData.walletAddress.trim()) && (
-            <p className="text-green-400 text-xs mt-1">✓ Valid address</p>
-          )}
-          {formData.walletAddress && !isValidAddress(formData.walletAddress.trim()) && (
-            <p className="text-red-400 text-xs mt-1">✗ Invalid address format</p>
+          {formData.walletAddress && (
+            <div>
+              {isValidAddress(formData.walletAddress.trim()) ? (
+                <p className="text-green-400 text-xs mt-1">✓ Valid address</p>
+              ) : (
+                <p className="text-red-400 text-xs mt-1">
+                  ✗ Invalid address (must be 42 characters starting with 0x)
+                </p>
+              )}
+            </div>
           )}
         </div>
 

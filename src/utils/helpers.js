@@ -82,7 +82,31 @@ export const formatTimeRemaining = (seconds) => {
  * @returns {boolean} True if valid address
  */
 export const isValidAddress = (address) => {
-  return ethers.isAddress(address);
+  if (!address || typeof address !== 'string') {
+    return false;
+  }
+  
+  // Remove any whitespace
+  const trimmed = address.trim();
+  
+  // Check if it starts with 0x and is 42 characters long
+  if (!trimmed.startsWith('0x') || trimmed.length !== 42) {
+    return false;
+  }
+  
+  // Check if it's a valid hex string
+  try {
+    // Try using ethers.isAddress first
+    if (ethers.isAddress(trimmed)) {
+      return true;
+    }
+  } catch (e) {
+    console.error("ethers.isAddress error:", e);
+  }
+  
+  // Fallback: check if all characters after 0x are valid hex
+  const hexPart = trimmed.slice(2);
+  return /^[0-9a-fA-F]{40}$/.test(hexPart);
 };
 
 /**

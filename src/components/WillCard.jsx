@@ -12,6 +12,20 @@ const WillCard = ({ will, beneficiaries, isTriggered }) => {
 
   return (
     <div className="space-y-4">
+      {/* Activity Status */}
+      <div className={`p-4 rounded-lg border-2 ${isTriggered ? "bg-red-900 border-red-600" : "bg-green-900 border-green-600"}`}>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold mb-1">{isTriggered ? "⚠️ INACTIVE" : "✓ ACTIVE"}</p>
+            <p className={`text-sm ${isTriggered ? "text-red-200" : "text-green-200"}`}>
+              {isTriggered 
+                ? "Your account is marked as inactive. Will can be executed at any time." 
+                : "Your account is active. Last check-in confirmed."}
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Will Summary */}
       <div className="p-4 bg-slate-800 border border-slate-700 rounded-lg">
         <h3 className="text-lg font-semibold text-white mb-3">Will Summary</h3>
@@ -54,7 +68,8 @@ const WillCard = ({ will, beneficiaries, isTriggered }) => {
       {/* Beneficiaries */}
       {beneficiaries && beneficiaries.length > 0 && (
         <div className="p-4 bg-slate-800 border border-slate-700 rounded-lg">
-          <h3 className="text-lg font-semibold text-white mb-3">Beneficiaries</h3>
+          <h3 className="text-lg font-semibold text-white mb-1">Beneficiaries</h3>
+          <p className="text-xs text-amber-400 mb-3">📋 This is what your beneficiaries will receive when the will is transferred:</p>
           <div className="space-y-2">
             {beneficiaries.map((beneficiary, index) => (
               <div key={index} className="p-3 bg-slate-900 rounded border border-slate-700 flex justify-between items-center">
@@ -64,10 +79,17 @@ const WillCard = ({ will, beneficiaries, isTriggered }) => {
                 </div>
                 <div className="text-right">
                   <p className="text-indigo-400 font-bold">{beneficiary.percentage}%</p>
-                  <p className="text-green-400 text-sm">{calculateBeneficiaryAmount(beneficiary.percentage, will.totalEthLocked)} ETH</p>
+                  <p className="text-green-400 text-sm font-bold">{calculateBeneficiaryAmount(beneficiary.percentage, will.totalEthLocked)} ETH</p>
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Transfer Preview */}
+          <div className="mt-4 p-3 bg-blue-900 border border-blue-600 rounded">
+            <p className="text-blue-200 text-sm font-semibold mb-2">💰 Total to Be Transferred:</p>
+            <p className="text-white text-2xl font-bold">{formatEther(will.totalEthLocked)} ETH</p>
+            <p className="text-blue-300 text-xs mt-1">When inactivity is triggered, these funds will be automatically distributed to your beneficiaries.</p>
           </div>
         </div>
       )}

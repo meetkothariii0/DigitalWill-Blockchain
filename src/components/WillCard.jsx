@@ -1,7 +1,13 @@
 import React from "react";
 import { formatEther, formatDate, formatAddress, calculateBeneficiaryAmount } from "../utils/helpers.js";
+import { generateWillPDF } from "../utils/generatePDF.js";
 
 const WillCard = ({ will, beneficiaries, isTriggered }) => {
+  const handleDownloadPDF = () => {
+    const fileName = `Digital_Will_${new Date().toISOString().split("T")[0]}.pdf`;
+    generateWillPDF(will, beneficiaries, will.testator, fileName);
+  };
+
   if (!will) {
     return (
       <div className="p-6 bg-slate-800 border-2 border-dashed border-slate-700 rounded-lg text-center">
@@ -90,6 +96,14 @@ const WillCard = ({ will, beneficiaries, isTriggered }) => {
             <p className="text-blue-200 text-sm font-semibold mb-2">💰 Total to Be Transferred:</p>
             <p className="text-white text-2xl font-bold">{formatEther(will.totalEthLocked)} ETH</p>
             <p className="text-blue-300 text-xs mt-1">When inactivity is triggered, these funds will be automatically distributed to your beneficiaries.</p>
+            
+            {/* Download PDF Button */}
+            <button
+              onClick={handleDownloadPDF}
+              className="mt-4 w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-semibold transition flex items-center justify-center gap-2"
+            >
+              📄 Download Will as PDF
+            </button>
           </div>
         </div>
       )}

@@ -7,6 +7,7 @@ import CountdownTimer from "../components/CountdownTimer.jsx";
 import ProofOfLifeButton from "../components/ProofOfLifeButton.jsx";
 import TransactionStatus from "../components/TransactionStatus.jsx";
 import { isValidAddress } from "../utils/helpers.js";
+import { generateWillPDF } from "../utils/generatePDF.js";
 import toast from "react-hot-toast";
 
 const MyWill = () => {
@@ -106,6 +107,16 @@ const MyWill = () => {
     } else {
       setTxStatus("error");
     }
+  };
+
+  const handleDownloadPDF = () => {
+    if (!will || !beneficiaries) {
+      toast.error("Will data not loaded");
+      return;
+    }
+    const fileName = `Digital_Will_${new Date().toISOString().split("T")[0]}.pdf`;
+    generateWillPDF(will, beneficiaries, account, fileName);
+    toast.success("Will PDF downloaded!");
   };
 
   if (loading) {
@@ -218,6 +229,13 @@ const MyWill = () => {
               ⚡ Execute Will Now
             </button>
           )}
+
+          <button
+            onClick={handleDownloadPDF}
+            className="px-4 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-semibold transition"
+          >
+            📄 Download as PDF
+          </button>
 
           <button
             onClick={() => setShowRevoke(!showRevoke)}

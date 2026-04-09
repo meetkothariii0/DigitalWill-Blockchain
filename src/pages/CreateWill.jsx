@@ -107,11 +107,6 @@ const CreateWill = () => {
       return;
     }
 
-    if (!formData.ethAmount || parseFloat(formData.ethAmount) <= 0) {
-      toast.error("Enter a valid ETH amount");
-      return;
-    }
-
     if (!ipfsHash) {
       toast.error("Upload a will document first");
       return;
